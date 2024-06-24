@@ -3,6 +3,9 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QGridLayout>
+#include <QMessageBox>
+#include "secondscreen.h" // Include your secondscreen header file here
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class gameframe; }
@@ -18,17 +21,29 @@ public:
 
 private slots:
     void cellClicked();
+    void goBack();
+    void resetGame(); // Added to reset the game board
+
 
 private:
     Ui::gameframe *ui;
+    QGridLayout *gridLayout;
     QPushButton *cellButtons[3][3];
+    QPushButton *backButton;
+    QPushButton *restartButton; // Added restart button
     char currentPlayer;
     int xWins;
     int oWins;
+    int draws;
 
+    // Instance of secondscreen
+    secondscreen *secondScreen;
+
+    void updateScores();
     bool checkWin(int row, int col);
     bool checkDraw();
-    void resetGame();
 };
 
 #endif // GAMEFRAME_H
+
+
