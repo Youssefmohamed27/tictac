@@ -1,9 +1,10 @@
 #include "gameframe.h"
 #include "ui_gameframe.h"
+#include "secondscreen.h" // Include secondscreen header
 #include <QPushButton>
 #include <QGridLayout>
 #include <QMessageBox>
-#include <QFont> // Include QFont for setting font properties
+#include <QFont>
 
 gameframe::gameframe(QWidget *parent)
     : QMainWindow(parent)
@@ -11,41 +12,52 @@ gameframe::gameframe(QWidget *parent)
     , currentPlayer('X')
     , xWins(0)
     , oWins(0)
+    , draws(0)
 {
-    setFixedSize(500, 600);
     ui->setupUi(this);
+    setFixedSize(500, 600);
 
-    // Create a grid layout to arrange the cells
-    QGridLayout *gridLayout = new QGridLayout(ui->centralwidget);
+    gridLayout = new QGridLayout(ui->centralwidget);
 
     // Create buttons for each cell of the Tic Tac Toe board
     for (int row = 0; row < 3; ++row) {
         for (int col = 0; col < 3; ++col) {
-            // Create a clickable button for each cell
             QPushButton *cellButton = new QPushButton;
-            cellButton->setFixedSize(100, 100); // Adjust the size of each cell
+            cellButton->setFixedSize(100, 100);
             cellButton->setProperty("row", row);
             cellButton->setProperty("col", col);
 
-            // Set the font size of the button text
             QFont font = cellButton->font();
-            font.setPointSize(36); // Set font size to 36 (adjust as needed)
+            font.setPointSize(36);
             cellButton->setFont(font);
 
-            // Connect the button to a slot for handling clicks
             connect(cellButton, &QPushButton::clicked, this, &gameframe::cellClicked);
 
-            // Add the cell button to the grid layout
             gridLayout->addWidget(cellButton, row, col);
-
-            // Store the cell button in the 2D array for easy access later
             cellButtons[row][col] = cellButton;
         }
     }
+
+    backButton = new QPushButton("Back");
+    QFont backFont = backButton->font();
+    backFont.setPointSize(16);
+    backButton->setFont(backFont);
+    connect(backButton, &QPushButton::clicked, this, &gameframe::goBack);
+    gridLayout->addWidget(backButton, 3, 0, 1, 3);
+
+    restartButton = new QPushButton("Restart");
+    QFont restartFont = restartButton->font();
+    restartFont.setPointSize(16);
+    restartButton->setFont(restartFont);
+    connect(restartButton, &QPushButton::clicked, this, &gameframe::resetGame);
+    gridLayout->addWidget(restartButton, 4, 0, 1, 3);
+
+    // Instantiate the secondscreen window
+    secondScreen = new secondscreen;
+
+    // Initialize and display the scores in the status bar
+    updateScores();
 }
-
-// Rest of the code remains the same...
-
 
 gameframe::~gameframe()
 {
@@ -61,17 +73,14 @@ void gameframe::cellClicked()
     int row = clickedButton->property("row").toInt();
     int col = clickedButton->property("col").toInt();
 
-    // Check if the cell is already occupied
     if (!clickedButton->text().isEmpty())
     {
         QMessageBox::warning(this, "Invalid Move", "This cell is already occupied.");
         return;
     }
 
-    // Set the current player's symbol (X or O) on the clicked cell
     clickedButton->setText(QString(currentPlayer));
 
-    // Check for a winner or a draw
     if (checkWin(row, col))
     {
         QMessageBox::information(this, "Winner", QString("Player %1 wins!").arg(currentPlayer));
@@ -79,16 +88,18 @@ void gameframe::cellClicked()
             xWins++;
         else
             oWins++;
+        updateScores();
         resetGame();
     }
     else if (checkDraw())
     {
         QMessageBox::information(this, "Draw", "It's a draw!");
+        draws++;
+        updateScores();
         resetGame();
     }
     else
     {
-        // Switch to the next player
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
 }
@@ -97,19 +108,16 @@ bool gameframe::checkWin(int row, int col)
 {
     QString symbol = QString(currentPlayer);
 
-    // Check row
     if (cellButtons[row][0]->text() == symbol &&
         cellButtons[row][1]->text() == symbol &&
         cellButtons[row][2]->text() == symbol)
         return true;
 
-    // Check column
     if (cellButtons[0][col]->text() == symbol &&
         cellButtons[1][col]->text() == symbol &&
         cellButtons[2][col]->text() == symbol)
         return true;
 
-    // Check diagonals
     if ((cellButtons[0][0]->text() == symbol &&
          cellButtons[1][1]->text() == symbol &&
          cellButtons[2][2]->text() == symbol) ||
@@ -123,7 +131,6 @@ bool gameframe::checkWin(int row, int col)
 
 bool gameframe::checkDraw()
 {
-    // Check if all cells are filled
     for (int row = 0; row < 3; ++row)
     {
         for (int col = 0; col < 3; ++col)
@@ -137,7 +144,6 @@ bool gameframe::checkDraw()
 
 void gameframe::resetGame()
 {
-    // Clear all cell buttons
     for (int row = 0; row < 3; ++row)
     {
         for (int col = 0; col < 3; ++col)
@@ -145,5 +151,21 @@ void gameframe::resetGame()
             cellButtons[row][col]->setText("");
         }
     }
+}
+
+void gameframe::goBack()
+{
+    // Show the secondscreen window and hide this window
+    secondScreen->show();
+    this->hide();
+}
+
+void gameframe::updateScores()
+{
+    // Update the score display in the status bar
+    QString xScoreStr = "Player X Wins: " + QString::number(xWins);
+    QString oScoreStr = "Player O Wins: " + QString::number(oWins);
+    QString drawsStr = "Draws: " + QString::number(draws);
+    ui->statusbar->showMessage(xScoreStr + " | " + oScoreStr + " | " + drawsStr);
 }
 
