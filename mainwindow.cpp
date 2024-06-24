@@ -107,6 +107,7 @@ void MainWindow::loginClicked()
     // Open the "secondscreen" window
     secondscreen *secondScreen = new secondscreen();
     secondScreen->show();
+    close(); // Close the current MainWindow
 }
 
 void MainWindow::signupClicked()
@@ -114,4 +115,5 @@ void MainWindow::signupClicked()
     // Open the "secondscreen" window
     secondscreen *secondScreen = new secondscreen();
     secondScreen->show();
+    close(); // Close the current MainWindow
 }
