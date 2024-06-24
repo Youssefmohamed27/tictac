@@ -1,5 +1,4 @@
 // gameframeai.cpp
-
 #include "gameframeai.h"
 #include "ui_gameframeai.h"
 #include <QMessageBox>
@@ -8,13 +7,20 @@
 #include "ui_gameframeai.h"
 #include <QPushButton>
 #include <QGridLayout>
+#include "secondscreen.h" // Include your secondscreen header file
 
-gameframeai::gameframeai(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::gameframeai)
+
+gameframeai::gameframeai(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::gameframeai)
 {
     ui->setupUi(this);
     setFixedSize(500, 600);
+
+    // Initialize scores
+    playerWins = 0;
+    aiWins = 0;
+    drawsCounter = 0;
 
     // Create a grid layout to arrange the cells
     QGridLayout *gridLayout = new QGridLayout(ui->centralwidget);
@@ -42,6 +48,22 @@ gameframeai::gameframeai(QWidget *parent) :
             cellButtons[row][col] = cellButton;
         }
     }
+
+    // Create back button
+    backButton = new QPushButton("Back");
+    QFont backFont = backButton->font();
+    backFont.setPointSize(16); // Set font size for back button
+    backButton->setFont(backFont);
+    connect(backButton, &QPushButton::clicked, this, &gameframeai::goBack);
+    gridLayout->addWidget(backButton, 3, 0, 1, 3); // Add back button to the layout
+
+    // Create restart button
+    restartButton = new QPushButton("Restart");
+    QFont restartFont = restartButton->font();
+    restartFont.setPointSize(16); // Set font size for restart button
+    restartButton->setFont(restartFont);
+    connect(restartButton, &QPushButton::clicked, this, &gameframeai::restartGame);
+    gridLayout->addWidget(restartButton, 4, 0, 1, 3); // Add restart button to the layout
 }
 
 gameframeai::~gameframeai()
@@ -71,12 +93,16 @@ void gameframeai::cellClicked()
     // Check for a player win or draw
     if (checkWin(row, col, "Player"))
     {
+        ++playerWins; // Increment player's win count
+        updateScores(); // Update scores display
         QMessageBox::information(this, "Winner", "Player wins!");
         resetGame();
         return;
     }
     else if (checkDraw())
     {
+        ++drawsCounter; // Increment draws counter
+        updateScores(); // Update scores display
         QMessageBox::information(this, "Draw", "It's a draw!");
         resetGame();
         return;
@@ -88,16 +114,35 @@ void gameframeai::cellClicked()
     // Check for an AI win or draw
     if (checkWin(lastAIMove.row, lastAIMove.col, "AI"))
     {
+        ++aiWins; // Increment AI's win count
+        updateScores(); // Update scores display
         QMessageBox::information(this, "Winner", "AI wins!");
         resetGame();
         return;
     }
     else if (checkDraw())
     {
+        ++drawsCounter; // Increment draws counter
+        updateScores(); // Update scores display
         QMessageBox::information(this, "Draw", "It's a draw!");
         resetGame();
         return;
     }
+}
+
+void gameframeai::goBack()
+{
+    // Hide current window and show secondscreen
+    hide(); // Hide the current window
+    secondscreen *second = new secondscreen;
+    second->show(); // Show the secondscreen window
+}
+
+void gameframeai::restartGame()
+{
+
+    resetGame(); // Reset the game board
+
 }
 
 bool gameframeai::checkWin(int row, int col, const QString& player)
@@ -274,4 +319,13 @@ int gameframeai::evaluateBoard()
     }
 
     return 0; // No winner
+}
+
+void gameframeai::updateScores()
+{
+    // Update the score display
+    QString playerScoreStr = "Player Wins: " + QString::number(playerWins);
+    QString aiScoreStr = "AI Wins: " + QString::number(aiWins);
+    QString drawsScoreStr = "Draws: " + QString::number(drawsCounter);
+    ui->statusbar->showMessage(playerScoreStr + " | " + aiScoreStr + " | " + drawsScoreStr);
 }
