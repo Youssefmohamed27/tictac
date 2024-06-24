@@ -1,5 +1,3 @@
-// gameframeai.h
-
 #ifndef GAMEFRAMEAI_H
 #define GAMEFRAMEAI_H
 
@@ -20,20 +18,32 @@ public:
 
 private slots:
     void cellClicked();
+    void goBack();
+    void restartGame(); // Added slot for restarting the current game
 
 private:
     Ui::gameframeai *ui;
     QPushButton *cellButtons[3][3];
+    QPushButton *backButton;
+    QPushButton *restartButton; // Added restart button
+
     struct Move {
-        int row, col;
+        int row;
+        int col;
     } lastAIMove;
 
+    int minimax(int depth, bool isMax);
+    int evaluateBoard();
     void aiMakeMove();
     bool checkWin(int row, int col, const QString& player);
     bool checkDraw();
     void resetGame();
-    int minimax(int depth, bool isMax);
-    int evaluateBoard();
+
+    int playerWins;    // Counter for player wins
+    int aiWins;        // Counter for AI wins
+    int drawsCounter;  // Counter for draws
+
+    void updateScores(); // Function to update the scores display
 };
 
 #endif // GAMEFRAMEAI_H
