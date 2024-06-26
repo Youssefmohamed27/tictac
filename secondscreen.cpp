@@ -2,6 +2,7 @@
 #include "ui_secondscreen.h"
 #include "gameframe.h" // Include the header file for the gameframe window
 #include "gameframeai.h" // Include the header file for the gameframeai window
+#include "gamehistory.h"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QDebug>
@@ -22,7 +23,7 @@ secondscreen::secondscreen(QWidget *parent) :
     buttonLayout->addWidget(button1);
     connect(button1, &QPushButton::clicked, this, &secondscreen::onButton1Clicked);
 
-    QPushButton *button2 = new QPushButton("2 Player");
+    QPushButton *button2 = new QPushButton("2 Players");
     setButtonStyle(button2);
     buttonLayout->addWidget(button2);
     connect(button2, &QPushButton::clicked, this, &secondscreen::onButton2Clicked);
@@ -69,24 +70,28 @@ void secondscreen::setButtonStyle(QPushButton *button)
 
 void secondscreen::onButton1Clicked()
 {
-    // Create and show the gameframe window when button1 is clicked
+    // Create and show the gameframeai window when button1 is clicked
     qDebug() << "1 Player button clicked!";
     gameframeai *gameFrameWindow = new gameframeai;
     gameFrameWindow->show();
+    close(); // Close the current secondscreen window
 }
 
 void secondscreen::onButton2Clicked()
 {
     // Create and show the gameframe window when button2 is clicked
-    qDebug() << "2 Player button clicked!";
+    qDebug() << "2 Players button clicked!";
     gameframe *gameFrameWindow = new gameframe;
     gameFrameWindow->show();
+    close(); // Close the current secondscreen window
 }
+
 
 void secondscreen::onButton3Clicked()
 {
-    // Function for Score History button clicked
+    // Create and show the gamehistory window when button3 is clicked
     qDebug() << "Score History button clicked!";
-    // Add your logic here
+    gamehistory *historyWindow = new gamehistory;
+    historyWindow->show();
+    close(); // Close the current secondscreen window
 }
-

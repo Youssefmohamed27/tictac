@@ -1,7 +1,9 @@
+// mainwindow.h
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QtSql>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,6 +23,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+    QLineEdit *usernameLineEdit;
+    QLineEdit *passwordLineEdit;
 };
 
 #endif // MAINWINDOW_H
+

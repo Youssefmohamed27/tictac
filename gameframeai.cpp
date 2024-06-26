@@ -1,14 +1,10 @@
-// gameframeai.cpp
 #include "gameframeai.h"
 #include "ui_gameframeai.h"
-#include <QMessageBox>
-#include <QRandomGenerator>
-#include "gameframeai.h"
-#include "ui_gameframeai.h"
+#include "secondscreen.h"
 #include <QPushButton>
 #include <QGridLayout>
-#include "secondscreen.h" // Include your secondscreen header file
-
+#include <QMessageBox>
+#include <QFont>
 
 gameframeai::gameframeai(QWidget *parent)
     : QMainWindow(parent)
@@ -21,6 +17,9 @@ gameframeai::gameframeai(QWidget *parent)
     playerWins = 0;
     aiWins = 0;
     drawsCounter = 0;
+    // Set default AI difficulty
+    maxDepth = 9; // Maximum depth for hardest difficulty
+
 
     // Create a grid layout to arrange the cells
     QGridLayout *gridLayout = new QGridLayout(ui->centralwidget);
@@ -64,6 +63,20 @@ gameframeai::gameframeai(QWidget *parent)
     restartButton->setFont(restartFont);
     connect(restartButton, &QPushButton::clicked, this, &gameframeai::restartGame);
     gridLayout->addWidget(restartButton, 4, 0, 1, 3); // Add restart button to the layout
+    QPushButton *easyButton = new QPushButton("Easy");
+    connect(easyButton, &QPushButton::clicked, this, &gameframeai::setDifficultyEasy);
+    gridLayout->addWidget(easyButton, 5, 0);
+
+    QPushButton *mediumButton = new QPushButton("Medium");
+    connect(mediumButton, &QPushButton::clicked, this, &gameframeai::setDifficultyMedium);
+    gridLayout->addWidget(mediumButton, 5, 1);
+
+    QPushButton *hardButton = new QPushButton("Hard");
+    connect(hardButton, &QPushButton::clicked, this, &gameframeai::setDifficultyHard);
+    gridLayout->addWidget(hardButton, 5, 2);
+
+    // Initially update scores display
+    updateScores();
 }
 
 gameframeai::~gameframeai()
@@ -140,9 +153,7 @@ void gameframeai::goBack()
 
 void gameframeai::restartGame()
 {
-
     resetGame(); // Reset the game board
-
 }
 
 bool gameframeai::checkWin(int row, int col, const QString& player)
@@ -197,6 +208,9 @@ void gameframeai::resetGame()
             cellButtons[row][col]->setText("");
         }
     }
+
+    // Update scores display after resetting
+    updateScores();
 }
 
 void gameframeai::aiMakeMove()
@@ -230,12 +244,28 @@ void gameframeai::aiMakeMove()
     lastAIMove = bestMove;
 }
 
+
+void gameframeai::setDifficultyEasy()
+{
+    maxDepth = 1; // Easy: very shallow search depth
+}
+
+void gameframeai::setDifficultyMedium()
+{
+    maxDepth = 4; // Medium: moderate search depth
+}
+
+void gameframeai::setDifficultyHard()
+{
+    maxDepth = 9; // Hard: maximum search depth
+}
+
 int gameframeai::minimax(int depth, bool isMax)
 {
     int score = evaluateBoard();
 
-    // Check if the game is over or if the maximum depth is reached
-    if (score == 10 || score == -10 || checkDraw() || depth >= 9)
+    // Check if the game is over, the maximum depth is reached, or the game is a draw
+    if (score == 10 || score == -10 || checkDraw() || depth >= maxDepth)
         return score;
 
     // If it's the maximizing player's turn (AI)

@@ -1,0 +1,11 @@
+release/gameframe.o
+release/gameframeai.o
+release/gamehistory.o
+release/main.o
+release/mainwindow.o
+release/secondscreen.o
+release/moc_gameframe.o
+release/moc_gameframeai.o
+release/moc_gamehistory.o
+release/moc_mainwindow.o
+release/moc_secondscreen.o

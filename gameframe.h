@@ -15,6 +15,7 @@ class gameframe : public QMainWindow
 {
     Q_OBJECT
 
+
 public:
     gameframe(QWidget *parent = nullptr);
     ~gameframe();
@@ -45,5 +46,4 @@ private:
 };
 
 #endif // GAMEFRAME_H
-
 

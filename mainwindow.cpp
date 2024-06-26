@@ -6,6 +6,13 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QMessageBox>
+#include <QCryptographicHash>
+#include <QMessageBox>
+#include <QCryptographicHash>
+#include <QMessageBox>
+#include <QSqlQuery>
+#include <QSqlError>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -24,10 +31,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Add labels and line edits for username and password
     QLabel *usernameLabel = new QLabel("Username:");
-    QLineEdit *usernameLineEdit = new QLineEdit;
+    usernameLineEdit = new QLineEdit;
     usernameLineEdit->setStyleSheet("QLineEdit { margin: 0; padding: 10px; font-size: 14px; }");
     QLabel *passwordLabel = new QLabel("Password:");
-    QLineEdit *passwordLineEdit = new QLineEdit;
+    passwordLineEdit = new QLineEdit;
     passwordLineEdit->setEchoMode(QLineEdit::Password);
     passwordLineEdit->setStyleSheet("QLineEdit { margin: 0; padding: 10px; font-size: 14px; }");
 
@@ -104,16 +111,124 @@ MainWindow::~MainWindow()
 
 void MainWindow::loginClicked()
 {
-    // Open the "secondscreen" window
-    secondscreen *secondScreen = new secondscreen();
-    secondScreen->show();
-    close(); // Close the current MainWindow
+    // Retrieve username and password from QLineEdit fields
+    QString username = usernameLineEdit->text();
+    QString password = passwordLineEdit->text();
+
+    // Open database connection
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("D:/final pr/databaseee/data.db"); // Replace with your database file path
+
+    if (!db.open()) {
+        qDebug() << "Error: connection with database failed";
+        QMessageBox::critical(this, "Database Error", "Connection with database failed. Login failed.");
+        return;
+    }
+
+    // Prepare SELECT statement
+    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    QString hashedPasswordHex = passwordHash.toHex();
+
+    // Print the hashed password in hexadecimal format
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
+    query.bindValue(":username", username);
+    query.bindValue(":password", hashedPasswordHex);
+
+    // Execute the query
+    if (query.exec() && query.next()) {
+        qDebug() << "Login successful!";
+        // Display a temporary success message
+        QMessageBox::information(this, "Login", "Login successful!");
+
+        // Close the database connection
+        db.close();
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+
+        // Open the "secondscreen" window (or perform other actions)
+        secondscreen *secondScreen = new secondscreen();
+        secondScreen->show();
+        close(); // Close the current MainWindow
+    } else {
+        qDebug() << "Login failed:" << query.lastError().text();
+        QMessageBox::critical(this, "Login Error", "Login failed: Username or password incorrect.");
+
+        // Close the database connection
+        db.close();
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+    }
 }
 
 void MainWindow::signupClicked()
 {
-    // Open the "secondscreen" window
-    secondscreen *secondScreen = new secondscreen();
-    secondScreen->show();
-    close(); // Close the current MainWindow
+    // Retrieve username and password from QLineEdit fields
+    QString username = usernameLineEdit->text().trimmed();
+    QString password = passwordLineEdit->text().trimmed();
+
+    // Check if username or password is empty
+    if (username.isEmpty() || password.isEmpty()) {
+        QMessageBox::critical(this, "Signup Error", "Username and password cannot be empty.");
+        return;
+    }
+
+    // Open database connection
+    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("D:/final pr/databaseee/data.db"); // Replace with your database file path
+
+    if (!db.open()) {
+        qDebug() << "Error: connection with database failed";
+        QMessageBox::critical(this, "Database Error", "Connection with database failed. Signup failed.");
+        return;
+    }
+
+    // Check if username already exists
+    QSqlQuery checkQuery(db);
+    checkQuery.prepare("SELECT username FROM users WHERE username = :username");
+    checkQuery.bindValue(":username", username);
+
+    if (checkQuery.exec() && checkQuery.next()) {
+        qDebug() << "Username already exists.";
+        QMessageBox::critical(this, "Signup Error", "Username already exists. Please choose another name.");
+        db.close();
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+        return;
+    }
+
+    // Prepare INSERT statement
+    // Hash the input password using SHA-256
+    QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
+    QString hashedPasswordHex = passwordHash.toHex();
+
+    // Print the hashed password in hexadecimal format
+    qDebug() << "Hashed password:" << hashedPasswordHex;
+    // Prepare INSERT statement with additional fields wins, draws, losses
+    QSqlQuery query(db);
+    query.prepare("INSERT INTO users (username, password, wins, draws, losses) "
+                  "VALUES (:username, :password, 0, 0, 0)"); // Initialize wins, draws, losses to 0
+    query.bindValue(":username", username);
+    query.bindValue(":password", hashedPasswordHex);
+
+    // Execute the query
+    if (query.exec()) {
+        qDebug() << "Signup successful!";
+        // Display a temporary success message
+        QMessageBox::information(this, "Signup", "Signup successful!");
+
+        // Close the database connection
+        db.close();
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+
+        // Open the "secondscreen" window (or perform other actions)
+        secondscreen *secondScreen = new secondscreen();
+        secondScreen->show();
+        close(); // Close the current MainWindow
+    } else {
+        qDebug() << "Signup failed:" << query.lastError().text();
+        QMessageBox::critical(this, "Signup Error", "Signup failed: " + query.lastError().text());
+
+        // Close the database connection
+        db.close();
+        QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
+    }
+
 }

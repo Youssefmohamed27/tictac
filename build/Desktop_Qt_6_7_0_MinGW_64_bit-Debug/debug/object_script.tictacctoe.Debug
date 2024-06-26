@@ -1,0 +1,11 @@
+debug/gameframe.o
+debug/gameframeai.o
+debug/gamehistory.o
+debug/main.o
+debug/mainwindow.o
+debug/secondscreen.o
+debug/moc_gameframe.o
+debug/moc_gameframeai.o
+debug/moc_gamehistory.o
+debug/moc_mainwindow.o
+debug/moc_secondscreen.o

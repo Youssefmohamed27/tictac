@@ -168,4 +168,3 @@ void gameframe::updateScores()
     QString drawsStr = "Draws: " + QString::number(draws);
     ui->statusbar->showMessage(xScoreStr + " | " + oScoreStr + " | " + drawsStr);
 }
-

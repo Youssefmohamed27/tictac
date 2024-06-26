@@ -26,6 +26,11 @@ private:
     QPushButton *cellButtons[3][3];
     QPushButton *backButton;
     QPushButton *restartButton; // Added restart button
+    int maxDepth; // Variable to control AI difficulty
+
+    void setDifficultyEasy();
+    void setDifficultyMedium();
+    void setDifficultyHard();
 
     struct Move {
         int row;
