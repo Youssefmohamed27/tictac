@@ -5,6 +5,9 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QFont>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QDebug>
 
 gameframeai::gameframeai(QWidget *parent)
     : QMainWindow(parent)
@@ -19,7 +22,6 @@ gameframeai::gameframeai(QWidget *parent)
     drawsCounter = 0;
     // Set default AI difficulty
     maxDepth = 9; // Maximum depth for hardest difficulty
-
 
     // Create a grid layout to arrange the cells
     QGridLayout *gridLayout = new QGridLayout(ui->centralwidget);
@@ -63,6 +65,8 @@ gameframeai::gameframeai(QWidget *parent)
     restartButton->setFont(restartFont);
     connect(restartButton, &QPushButton::clicked, this, &gameframeai::restartGame);
     gridLayout->addWidget(restartButton, 4, 0, 1, 3); // Add restart button to the layout
+
+    // Create difficulty buttons
     QPushButton *easyButton = new QPushButton("Easy");
     connect(easyButton, &QPushButton::clicked, this, &gameframeai::setDifficultyEasy);
     gridLayout->addWidget(easyButton, 5, 0);
@@ -86,6 +90,9 @@ gameframeai::~gameframeai()
 
 void gameframeai::cellClicked()
 {
+    QElapsedTimer timer;
+    timer.start();
+
     QPushButton *clickedButton = qobject_cast<QPushButton*>(sender());
     if (!clickedButton)
         return;
@@ -100,6 +107,9 @@ void gameframeai::cellClicked()
         return;
     }
 
+    // Simulate additional workload to make elapsed time measurable
+    QThread::msleep(50);
+
     // Set the player's symbol (X) on the clicked cell
     clickedButton->setText("X");
 
@@ -110,7 +120,6 @@ void gameframeai::cellClicked()
         updateScores(); // Update scores display
         QMessageBox::information(this, "Winner", "Player wins!");
         resetGame();
-        return;
     }
     else if (checkDraw())
     {
@@ -118,29 +127,31 @@ void gameframeai::cellClicked()
         updateScores(); // Update scores display
         QMessageBox::information(this, "Draw", "It's a draw!");
         resetGame();
-        return;
+    }
+    else
+    {
+        // AI's turn
+        aiMakeMove();
+
+        // Check for an AI win or draw
+        if (checkWin(lastAIMove.row, lastAIMove.col, "AI"))
+        {
+            ++aiWins; // Increment AI's win count
+            updateScores(); // Update scores display
+            QMessageBox::information(this, "Winner", "AI wins!");
+            resetGame();
+        }
+        else if (checkDraw())
+        {
+            ++drawsCounter; // Increment draws counter
+            updateScores(); // Update scores display
+            QMessageBox::information(this, "Draw", "It's a draw!");
+            resetGame();
+        }
     }
 
-    // AI's turn
-    aiMakeMove();
-
-    // Check for an AI win or draw
-    if (checkWin(lastAIMove.row, lastAIMove.col, "AI"))
-    {
-        ++aiWins; // Increment AI's win count
-        updateScores(); // Update scores display
-        QMessageBox::information(this, "Winner", "AI wins!");
-        resetGame();
-        return;
-    }
-    else if (checkDraw())
-    {
-        ++drawsCounter; // Increment draws counter
-        updateScores(); // Update scores display
-        QMessageBox::information(this, "Draw", "It's a draw!");
-        resetGame();
-        return;
-    }
+    qint64 elapsed = timer.elapsed();
+    qDebug() << "Elapsed time for the button clicked = " << elapsed << "ms";
 }
 
 void gameframeai::goBack()
@@ -243,7 +254,6 @@ void gameframeai::aiMakeMove()
     cellButtons[bestMove.row][bestMove.col]->setText("O");
     lastAIMove = bestMove;
 }
-
 
 void gameframeai::setDifficultyEasy()
 {

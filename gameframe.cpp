@@ -5,6 +5,9 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include <QFont>
+#include <QElapsedTimer>
+#include <QThread>
+#include <QDebug>
 
 gameframe::gameframe(QWidget *parent)
     : QMainWindow(parent)
@@ -66,6 +69,9 @@ gameframe::~gameframe()
 
 void gameframe::cellClicked()
 {
+    QElapsedTimer timer;
+    timer.start();
+
     QPushButton *clickedButton = qobject_cast<QPushButton*>(sender());
     if (!clickedButton)
         return;
@@ -78,6 +84,9 @@ void gameframe::cellClicked()
         QMessageBox::warning(this, "Invalid Move", "This cell is already occupied.");
         return;
     }
+
+    // Simulate additional workload to make elapsed time measurable
+    QThread::msleep(50);
 
     clickedButton->setText(QString(currentPlayer));
 
@@ -102,6 +111,9 @@ void gameframe::cellClicked()
     {
         currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
     }
+
+    qint64 elapsed = timer.elapsed();
+    qDebug() << "Elapsed time for the button clicked = " << elapsed << "ms";
 }
 
 bool gameframe::checkWin(int row, int col)
