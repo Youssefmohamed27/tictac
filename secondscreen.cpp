@@ -23,7 +23,7 @@ secondscreen::secondscreen(QWidget *parent) :
     buttonLayout->addWidget(button1);
     connect(button1, &QPushButton::clicked, this, &secondscreen::onButton1Clicked);
 
-    QPushButton *button2 = new QPushButton("2 Players");
+    QPushButton *button2 = new QPushButton("2 Playerss");
     setButtonStyle(button2);
     buttonLayout->addWidget(button2);
     connect(button2, &QPushButton::clicked, this, &secondscreen::onButton2Clicked);
