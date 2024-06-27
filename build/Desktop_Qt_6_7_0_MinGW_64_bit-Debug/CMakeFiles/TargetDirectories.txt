@@ -1,0 +1,9 @@
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/tic_tac_toe.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/edit_cache.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/rebuild_cache.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/list_install_components.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install/local.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/install/strip.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/tic_tac_toe_autogen_timestamp_deps.dir
+D:/final pr/tic_tac_toe/build/Desktop_Qt_6_7_0_MinGW_64_bit-Debug/CMakeFiles/tic_tac_toe_autogen.dir
