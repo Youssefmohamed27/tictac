@@ -2,6 +2,7 @@
 #include <QSignalSpy>
 #include "mainwindow.h"
 #include <QPushButton>
+#include <QMessageBox>
 
 class TestMainWindow : public QObject
 {
