@@ -1,17 +1,18 @@
 #include "secondscreen.h"
 #include "ui_secondscreen.h"
-#include "gameframe.h" // Include the header file for the gameframe window
-#include "gameframeai.h" // Include the header file for the gameframeai window
+#include "gameframe.h"
+#include "gameframeai.h"
 #include "gamehistory.h"
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QDebug>
 
-secondscreen::secondscreen(QWidget *parent) :
+secondscreen::secondscreen(const QString &loggedInUsername, QWidget *parent) :
     QMainWindow(parent),
-    ui(new Ui::secondscreen)
+    ui(new Ui::secondscreen),
+    loggedInUsername(loggedInUsername) // Store loggedInUsername in the member variable
 {
-    setFixedSize(500,600);
+    setFixedSize(500, 600);
     ui->setupUi(this);
 
     // Create layout for buttons
@@ -72,7 +73,7 @@ void secondscreen::onButton1Clicked()
 {
     // Create and show the gameframeai window when button1 is clicked
     qDebug() << "1 Player button clicked!";
-    gameframeai *gameFrameWindow = new gameframeai;
+    gameframeai *gameFrameWindow = new gameframeai(loggedInUsername); // Pass loggedInUsername
     gameFrameWindow->show();
     close(); // Close the current secondscreen window
 }
@@ -81,17 +82,15 @@ void secondscreen::onButton2Clicked()
 {
     // Create and show the gameframe window when button2 is clicked
     qDebug() << "2 Players button clicked!";
-    gameframe *gameFrameWindow = new gameframe;
+    gameframe *gameFrameWindow = new gameframe(loggedInUsername); // Pass loggedInUsername
     gameFrameWindow->show();
     close(); // Close the current secondscreen window
 }
 
-
 void secondscreen::onButton3Clicked()
 {
-    // Create and show the gamehistory window when button3 is clicked
     qDebug() << "Score History button clicked!";
-    gamehistory *historyWindow = new gamehistory;
+    gamehistory *historyWindow = new gamehistory(loggedInUsername); // Pass loggedInUsername
     historyWindow->show();
     close(); // Close the current secondscreen window
 }
