@@ -15,7 +15,7 @@ class secondscreen : public QMainWindow
     Q_OBJECT
 
 public:
-    secondscreen(QWidget *parent = nullptr);
+    explicit secondscreen(const QString &loggedInUsername, QWidget *parent = nullptr); // Constructor to receive loggedInUsername
     ~secondscreen();
 
 private slots:
@@ -25,6 +25,7 @@ private slots:
 
 private:
     Ui::secondscreen *ui;
+    QString loggedInUsername; // Member variable to store loggedInUsername
     void setButtonStyle(QPushButton *button);
 };
 
