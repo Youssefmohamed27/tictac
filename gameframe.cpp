@@ -24,7 +24,7 @@ gameframe::gameframe(const QString &loggedInUsername, QWidget *parent)
 
     if (!db.open()) {
         qDebug() << "Error: connection with database failed";
-        QMessageBox::critical(this, "Database Error", "Connection with database failed. Signup failed.");
+        QMessageBox::critical(this, "Database Error", "Connection with database failedd. Signup failed.");
         return;}
     setFixedSize(500, 600);
 
