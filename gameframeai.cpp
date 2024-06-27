@@ -8,12 +8,25 @@
 #include <QElapsedTimer>
 #include <QThread>
 #include <QDebug>
+#include <QThread>
+#include <QDebug>
 
-gameframeai::gameframeai(QWidget *parent)
+
+gameframeai::gameframeai(const QString &loggedInUsername, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::gameframeai)
+, loggedInUsername(loggedInUsername) // Initialize the member variable
+
+
 {
     ui->setupUi(this);
+    db = QSqlDatabase::addDatabase("QSQLITE");
+    db.setDatabaseName("D:/final pr/databaseee/data.db"); // Replace with your database file path
+
+    if (!db.open()) {
+        qDebug() << "Error: connection with database failed";
+        QMessageBox::critical(this, "Database Error", "Connection with database failed. Signup failed.");
+        return;}
     setFixedSize(500, 600);
 
     // Initialize scores
@@ -130,6 +143,7 @@ void gameframeai::cellClicked()
     }
     else
     {
+
         // AI's turn
         aiMakeMove();
 
@@ -158,7 +172,8 @@ void gameframeai::goBack()
 {
     // Hide current window and show secondscreen
     hide(); // Hide the current window
-    secondscreen *second = new secondscreen;
+    secondscreen *second = new secondscreen(loggedInUsername);
+    updateDatabase();
     second->show(); // Show the secondscreen window
 }
 
@@ -368,4 +383,46 @@ void gameframeai::updateScores()
     QString aiScoreStr = "AI Wins: " + QString::number(aiWins);
     QString drawsScoreStr = "Draws: " + QString::number(drawsCounter);
     ui->statusbar->showMessage(playerScoreStr + " | " + aiScoreStr + " | " + drawsScoreStr);
+}
+void gameframeai::updateDatabase() {
+    db.open();
+    QSqlDatabase::database().transaction();
+
+    // Retrieve current values from the database for username 'oza'
+    QSqlQuery querySelect(db);
+    querySelect.prepare("SELECT wins, draws, losses FROM users WHERE username = :oza");
+    querySelect.bindValue(":oza", loggedInUsername);
+    if (!querySelect.exec() || !querySelect.next()) {
+        qDebug() << "Error selecting current values from database:" << querySelect.lastError().text();
+        QSqlDatabase::database().rollback();
+        db.close();
+        return;
+    }
+
+    // Retrieve current values
+    int currentWins = querySelect.value(0).toInt();
+    int currentDraws = querySelect.value(1).toInt();
+    int currentLosses = querySelect.value(2).toInt();
+
+    // Calculate new values
+    int newWins = currentWins + playerWins;  // Replace xWins with your variable holding new wins to add
+    int newDraws = currentDraws + drawsCounter;  // Replace draws with your variable holding new draws to add
+    int newLosses = currentLosses + aiWins;  // Replace oWins with your variable holding new losses to add
+
+    // Update values in the database for username 'oza'
+    QSqlQuery queryUpdate(db);
+    queryUpdate.prepare("UPDATE users SET wins = :wins, draws = :draws, losses = :losses WHERE username = :oza");
+    queryUpdate.bindValue(":oza", loggedInUsername);
+    queryUpdate.bindValue(":wins", newWins);
+    queryUpdate.bindValue(":draws", newDraws);
+    queryUpdate.bindValue(":losses", newLosses);
+
+    if (!queryUpdate.exec()) {
+        qDebug() << "Error updating database:" << queryUpdate.lastError().text();
+        QSqlDatabase::database().rollback();
+    } else {
+        QSqlDatabase::database().commit();
+    }
+
+    db.close();
 }
