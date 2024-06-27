@@ -1,9 +1,8 @@
-// mainwindow.h
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QtSql>
+#include <QLineEdit>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -17,7 +16,11 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-private slots:
+    QLineEdit* getUsernameLineEdit() const { return usernameLineEdit; }
+    QLineEdit* getPasswordLineEdit() const { return passwordLineEdit; }
+    QString getLoggedInUsername() const { return loggedInUsername; } // Add this method
+
+public slots:
     void loginClicked();
     void signupClicked();
 
@@ -25,7 +28,7 @@ private:
     Ui::MainWindow *ui;
     QLineEdit *usernameLineEdit;
     QLineEdit *passwordLineEdit;
+    QString loggedInUsername;
 };
 
 #endif // MAINWINDOW_H
-
