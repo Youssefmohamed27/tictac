@@ -18,8 +18,9 @@ public:
 
     QLineEdit* getUsernameLineEdit() const { return usernameLineEdit; }
     QLineEdit* getPasswordLineEdit() const { return passwordLineEdit; }
+    QString getLoggedInUsername() const { return loggedInUsername; } // Add this method
 
-public slots:  // Change from private to public slots
+public slots:
     void loginClicked();
     void signupClicked();
 

@@ -8,13 +8,9 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include <QCryptographicHash>
-#include <QMessageBox>
-#include <QCryptographicHash>
-#include <QMessageBox>
+#include <QDebug>
 #include <QSqlQuery>
 #include <QSqlError>
-
-
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -129,9 +125,8 @@ void MainWindow::loginClicked()
 
     // Prepare SELECT statement
     QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
-    QString hashedPasswordHex = passwordHash.toHex();
+    QString hashedPasswordHex = QString(passwordHash.toHex());
 
-    // Print the hashed password in hexadecimal format
     QSqlQuery query(db);
     query.prepare("SELECT * FROM users WHERE username = :username AND password = :password");
     query.bindValue(":username", username);
@@ -141,16 +136,14 @@ void MainWindow::loginClicked()
     if (query.exec() && query.next()) {
         qDebug() << "Login successful!";
         loggedInUsername = username;
-        // Display a temporary success message
         QMessageBox::information(this, "Login", "Login successful!");
 
         // Close the database connection
         db.close();
         QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
 
-        // Open the "secondscreen" window (or perform other actions)
+        // Open the "secondscreen" window
         secondscreen *secondScreen = new secondscreen(loggedInUsername);
-
         secondScreen->show();
         close(); // Close the current MainWindow
     } else {
@@ -199,16 +192,12 @@ void MainWindow::signupClicked()
     }
 
     // Prepare INSERT statement
-    // Hash the input password using SHA-256
     QByteArray passwordHash = QCryptographicHash::hash(password.toUtf8(), QCryptographicHash::Sha256);
-    QString hashedPasswordHex = passwordHash.toHex();
+    QString hashedPasswordHex = QString(passwordHash.toHex());
 
-    // Print the hashed password in hexadecimal format
-    qDebug() << "Hashed password:" << hashedPasswordHex;
-    // Prepare INSERT statement with additional fields wins, draws, losses
     QSqlQuery query(db);
     query.prepare("INSERT INTO users (username, password, wins, draws, losses) "
-                  "VALUES (:username, :password, 0, 0, 0)"); // Initialize wins, draws, losses to 0
+                  "VALUES (:username, :password, 0, 0, 0)");
     query.bindValue(":username", username);
     query.bindValue(":password", hashedPasswordHex);
 
@@ -216,16 +205,14 @@ void MainWindow::signupClicked()
     if (query.exec()) {
         qDebug() << "Signup successful!";
         loggedInUsername = username;
-        // Display a temporary success message
         QMessageBox::information(this, "Signup", "Signup successful!");
 
         // Close the database connection
         db.close();
         QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
 
-        // Open the "secondscreen" window (or perform other actions)
+        // Open the "secondscreen" window
         secondscreen *secondScreen = new secondscreen(loggedInUsername);
-
         secondScreen->show();
         close(); // Close the current MainWindow
     } else {
@@ -236,5 +223,4 @@ void MainWindow::signupClicked()
         db.close();
         QSqlDatabase::removeDatabase(QSqlDatabase::defaultConnection);
     }
-
 }

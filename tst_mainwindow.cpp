@@ -1,5 +1,7 @@
 #include <QtTest/QtTest>
+#include <QSignalSpy>
 #include "mainwindow.h"
+#include <QPushButton>
 
 class TestMainWindow : public QObject
 {
@@ -11,7 +13,7 @@ private slots:
     void init();             // Called before each test function
     void cleanup();          // Called after each test function
 
-    // Add your test functions here
+    // Test cases
     void testLoginSuccess();
     void testLoginFailure();
     void testSignupSuccess();
@@ -23,76 +25,104 @@ private:
 
 void TestMainWindow::initTestCase()
 {
+    // Initialize resources or setup database connections needed for tests
     mainWindow = new MainWindow();
 }
 
 void TestMainWindow::cleanupTestCase()
 {
+    // Cleanup resources or close database connections after all tests are done
     delete mainWindow;
 }
 
 void TestMainWindow::init()
 {
-    // Runs before each test case
+    // Setup before each test function
 }
 
 void TestMainWindow::cleanup()
 {
-    // Runs after each test case
+    // Cleanup after each test function
 }
 
 void TestMainWindow::testLoginSuccess()
 {
     // Simulate user input
-    mainWindow->getUsernameLineEdit()->setText("correctUsername");
-    mainWindow->getPasswordLineEdit()->setText("correctPassword");
+    QTest::keyClicks(mainWindow->getUsernameLineEdit(), "correctUsername");
+    QTest::keyClicks(mainWindow->getPasswordLineEdit(), "correctPassword");
 
-    // Call the login function using QMetaObject::invokeMethod
-    QMetaObject::invokeMethod(mainWindow, "loginClicked", Qt::DirectConnection);
+    // Connect to loginClicked() slot
+    QSignalSpy spy(mainWindow, &MainWindow::loginClicked);
 
-    // Check if the login was successful
-    // Add a method or use signals to verify this
-    // For example:
-    //QCOMPARE(mainWindow->isLoggedIn(), true);
+    // Trigger login button click
+    QPushButton *loginButton = mainWindow->findChild<QPushButton*>("loginButton");
+    QVERIFY(loginButton != nullptr);
+    QTest::mouseClick(loginButton, Qt::LeftButton);
+
+    // Check if loginClicked() was emitted
+    QVERIFY(spy.wait());
+    QCOMPARE(mainWindow->getLoggedInUsername(), QString("correctUsername"));
+    // Add further verifications if needed
 }
 
 void TestMainWindow::testLoginFailure()
 {
     // Simulate user input
-    mainWindow->getUsernameLineEdit()->setText("wrongUsername");
-    mainWindow->getPasswordLineEdit()->setText("wrongPassword");
+    QTest::keyClicks(mainWindow->getUsernameLineEdit(), "wrongUsername");
+    QTest::keyClicks(mainWindow->getPasswordLineEdit(), "wrongPassword");
 
-    // Call the login function using QMetaObject::invokeMethod
-    QMetaObject::invokeMethod(mainWindow, "loginClicked", Qt::DirectConnection);
+    // Connect to loginClicked() slot
+    QSignalSpy spy(mainWindow, &MainWindow::loginClicked);
 
-    // Check if the login failed
-    // QCOMPARE(mainWindow->isLoggedIn(), false);
+    // Trigger login button click
+    QPushButton *loginButton = mainWindow->findChild<QPushButton*>("loginButton");
+    QVERIFY(loginButton != nullptr);
+    QTest::mouseClick(loginButton, Qt::LeftButton);
+
+    // Check if loginClicked() was emitted
+    QVERIFY(spy.wait());
+    QVERIFY(mainWindow->getLoggedInUsername().isEmpty());
+    // Add further verifications if needed
 }
 
 void TestMainWindow::testSignupSuccess()
 {
     // Simulate user input
-    mainWindow->getUsernameLineEdit()->setText("newUser");
-    mainWindow->getPasswordLineEdit()->setText("newPassword");
+    QTest::keyClicks(mainWindow->getUsernameLineEdit(), "newUser");
+    QTest::keyClicks(mainWindow->getPasswordLineEdit(), "newPassword");
 
-    // Call the signup function using QMetaObject::invokeMethod
-    QMetaObject::invokeMethod(mainWindow, "signupClicked", Qt::DirectConnection);
+    // Connect to signupClicked() slot
+    QSignalSpy spy(mainWindow, &MainWindow::signupClicked);
 
-    // Check if the signup was successful
-    // QCOMPARE(mainWindow->isSignedUp(), true);
+    // Trigger signup button click
+    QPushButton *signupButton = mainWindow->findChild<QPushButton*>("signupButton");
+    QVERIFY(signupButton != nullptr);
+    QTest::mouseClick(signupButton, Qt::LeftButton);
+
+    // Check if signupClicked() was emitted
+    QVERIFY(spy.wait());
+    QCOMPARE(mainWindow->getLoggedInUsername(), QString("newUser"));
+    // Add further verifications if needed
 }
 
 void TestMainWindow::testSignupFailure()
 {
-    // Simulate user input with existing username
-    mainWindow->getUsernameLineEdit()->setText("existingUser");
-    mainWindow->getPasswordLineEdit()->setText("password");
+    // Simulate user input
+    QTest::keyClicks(mainWindow->getUsernameLineEdit(), "existingUser");
+    QTest::keyClicks(mainWindow->getPasswordLineEdit(), "password");
 
-    // Call the signup function using QMetaObject::invokeMethod
-    QMetaObject::invokeMethod(mainWindow, "signupClicked", Qt::DirectConnection);
+    // Connect to signupClicked() slot
+    QSignalSpy spy(mainWindow, &MainWindow::signupClicked);
 
-    // Check if the signup failed
-    // QCOMPARE(mainWindow->isSignedUp(), false);
+    // Trigger signup button click
+    QPushButton *signupButton = mainWindow->findChild<QPushButton*>("signupButton");
+    QVERIFY(signupButton != nullptr);
+    QTest::mouseClick(signupButton, Qt::LeftButton);
+
+    // Check if signupClicked() was emitted
+    QVERIFY(spy.wait());
+    QVERIFY(mainWindow->getLoggedInUsername().isEmpty());
+    // Add further verifications if needed
 }
 
 
