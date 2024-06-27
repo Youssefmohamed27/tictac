@@ -1,5 +1,6 @@
 QT       += core gui sql
 QT += sql
+QT += testlib
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,7 +16,8 @@ SOURCES += \
     gamehistory.cpp \
     main.cpp \
     mainwindow.cpp \
-    secondscreen.cpp
+    secondscreen.cpp \
+    tst_mainwindow.cpp
 
 HEADERS += \
     gameframe.h \
@@ -27,6 +29,7 @@ HEADERS += \
 FORMS += \
     gameframe.ui \
     gameframeai.ui \
+    gamehistory.ui \
     mainwindow.ui \
     secondscreen.ui
 
