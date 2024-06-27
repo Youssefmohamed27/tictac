@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QPushButton>
+#include <QtSql>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class gameframeai; }
@@ -13,7 +14,7 @@ class gameframeai : public QMainWindow
     Q_OBJECT
 
 public:
-    gameframeai(QWidget *parent = nullptr);
+    explicit gameframeai(const QString &loggedInUsername, QWidget *parent = nullptr); // Constructor to accept loggedInUsername
     ~gameframeai();
 
 private slots:
@@ -26,11 +27,16 @@ private:
     QPushButton *cellButtons[3][3];
     QPushButton *backButton;
     QPushButton *restartButton; // Added restart button
+    QSqlDatabase db;
     int maxDepth; // Variable to control AI difficulty
+
+    QString loggedInUsername; // Member variable to store loggedInUsername
 
     void setDifficultyEasy();
     void setDifficultyMedium();
     void setDifficultyHard();
+    void updateDatabase();
+
 
     struct Move {
         int row;
