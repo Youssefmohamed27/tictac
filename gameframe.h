@@ -6,6 +6,7 @@
 #include <QGridLayout>
 #include <QMessageBox>
 #include "secondscreen.h" // Include your secondscreen header file here
+#include <QtSql>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class gameframe; }
@@ -15,9 +16,8 @@ class gameframe : public QMainWindow
 {
     Q_OBJECT
 
-
 public:
-    gameframe(QWidget *parent = nullptr);
+    explicit gameframe(const QString &loggedInUsername, QWidget *parent = nullptr); // Constructor to accept loggedInUsername
     ~gameframe();
 
 private slots:
@@ -33,16 +33,20 @@ private:
     QPushButton *backButton;
     QPushButton *restartButton; // Added restart button
     char currentPlayer;
+    QSqlDatabase db;
     int xWins;
     int oWins;
     int draws;
 
     // Instance of secondscreen
     secondscreen *secondScreen;
+     QString loggedInUsername; // Member variable to store loggedInUsername
 
     void updateScores();
+    void updateDatabase();
     bool checkWin(int row, int col);
     bool checkDraw();
+
 };
 
 #endif // GAMEFRAME_H
